@@ -1,47 +1,67 @@
 #include <iostream>
 #include "money.h"
+#include <fstream>
 
-void Money::normalise() 
+void normalise(Money& price) 
 {
-    if (kop >= 100) 
+    if (price.kop >= 100) 
     {
-        grn += kop / 100;
-        kop %= 100;
+        price.grn += price.kop / 100;
+        price.kop %= 100;
     }
 }
 
-void Money::display()
+void display(const Money& price)
 {
-    std::cout << grn << " grn " << kop << " kop " << std::endl;
+    std::cout << price.grn << " grn " << price.kop << " kop " << std::endl;
 }
 
-void Money::add(Money second_price)
+void add(Money& first_price, const Money& second_price)
 {
-    grn += second_price.grn;
-    kop += second_price.kop;
-    normalise();
+    first_price.grn += second_price.grn;
+    first_price.kop += second_price.kop;
+    normalise(first_price);
 }
 
-void Money::multiply(int quantity)
+void multiply(Money& price, int quantity)
 {
-    grn *= quantity;
-    kop *= quantity;
+    price.grn *= quantity;
+    price.kop *= quantity;
 
-    normalise();
+    normalise(price);
 }
 
-void Money::round()
+void round(Money& price)
 {
-    int last_digit = kop % 10;
+    int last_digit = price.kop % 10;
     if (last_digit >= 5)
     {
-        kop = ((kop / 10) + 1) * 10;
+        price.kop = ((price.kop / 10) + 1) * 10;
     } else 
     {
-        kop = (kop / 10) * 10;
+        price.kop = (price.kop / 10) * 10;
     }
 
-    normalise();
+    normalise(price);
 }
 
+bool process_receipt(const char* filename, Money& total)
+{
+    std::ifstream receipt_txt(filename);
+    if (!receipt_txt.is_open())
+    {
+        printf("Cannot open file\n");
+        return false;
+    }
+    int grn;
+    short int kop;
+    int quantity;
 
+    while (receipt_txt >> grn >> kop >> quantity) 
+    {
+        Money price = {grn, kop};
+        multiply(price, quantity);
+        add(total, price);
+    }
+    return true;
+}
