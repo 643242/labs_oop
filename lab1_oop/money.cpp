@@ -1,7 +1,7 @@
 #include <iostream>
 #include "money.h"
 #include <fstream>
-
+ 
 void normalise(Money& price) 
 {
     if (price.kop >= 100) 
@@ -45,14 +45,16 @@ void round(Money& price)
     normalise(price);
 }
 
-bool process_receipt(const char* filename, Money& total)
+bool process_receipt(const char* filename)
 {
+    Money total = {0, 0};
     std::ifstream receipt_txt(filename);
     if (!receipt_txt.is_open())
     {
         printf("Cannot open file\n");
         return false;
     }
+
     int grn;
     short int kop;
     int quantity;
@@ -63,5 +65,13 @@ bool process_receipt(const char* filename, Money& total)
         multiply(price, quantity);
         add(total, price);
     }
+
+    std::cout << "Total price: ";
+    display(total);
+
+    std::cout << "Total price (rounded): ";
+    round(total);
+    display(total);
+
     return true;
 }
