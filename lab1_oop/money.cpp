@@ -58,8 +58,9 @@ bool process_receipt(const char* filename)
     int grn;
     short int kop;
     int quantity;
+    std::string name;
 
-    while (receipt_txt >> grn >> kop >> quantity) 
+    while (receipt_txt >> name >> grn >> kop >> quantity) 
     {
         Money price = {grn, kop};
         multiply(price, quantity);
