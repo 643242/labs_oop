@@ -34,14 +34,15 @@ void multiply(Money& price, int quantity)
 void round(Money& price)
 {
     int last_digit = price.kop % 10;
+
     if (last_digit >= 5)
     {
-        price.kop = ((price.kop / 10) + 1) * 10;
-    } else 
-    {
-        price.kop = (price.kop / 10) * 10;
+        price.kop = price.kop + (10 - last_digit);
     }
-
+    else
+    {
+        price.kop = price.kop - last_digit;
+    }
     normalise(price);
 }
 
