@@ -41,6 +41,19 @@ bool is_triangle_valid(const Triangle& t)
     return t.area() >= 1e-9;
 }
 
+long double distance(const Point& p1, const Point& p2) {
+    return std::sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
+}
+
+long double heron_area(const Point& A, const Point& B, const Point& C) {
+    long double a = distance(B, C);
+    long double b = distance(A, C);
+    long double c = distance(A, B);
+    long double s = (a + b + c) / 2.0;
+    long double val = s * (s - a) * (s - b) * (s - c);
+    return val > 0 ? std::sqrt(val) : 0.0;
+}
+
 void check_points(const Triangle& t)
 {
     int num_points;
@@ -59,6 +72,7 @@ void check_points(const Triangle& t)
 
         Point P = {x, y};
 
+        // 1.cross product
         Point AP = {P.x - t.A.x, P.y - t.A.y};
         Point BP = {P.x - t.B.x, P.y - t.B.y};
         Point CP = {P.x - t.C.x, P.y - t.C.y};
@@ -68,22 +82,71 @@ void check_points(const Triangle& t)
         double D3 = vector_product(CA, CP);
 
         bool on_AB = (std::abs(D1) < 1e-14) && (AP.x * BP.x <= 1e-14) && (AP.y * BP.y <= 1e-14);
-
         bool on_BC = (std::abs(D2) < 1e-14) && (BP.x * CP.x <= 1e-14) && (BP.y * CP.y <= 1e-14);
-
         bool on_CA = (std::abs(D3) < 1e-14) && (CP.x * AP.x <= 1e-14) && (CP.y * AP.y <= 1e-14);
 
+        std::cout << "Vector product: Point (" << x << ", " << y << ") ";
         if (on_AB || on_BC || on_CA) 
         {
-            std::cout << "Point (" << x << ", " << y << ") is on the edge\n";
+            std::cout << "is on the edge\n";
         }
         else if ((D1 > 0 && D2 > 0 && D3 > 0) || (D1 < 0 && D2 < 0 && D3 < 0)) 
         {
-            std::cout << "Point (" << x << ", " << y << ") is inside\n";
+            std::cout << "is inside\n";
         }
         else 
         {
-            std::cout << "Point (" << x << ", " << y << ") is outside\n";
+            std::cout << "is outside\n";
+        }
+
+        // Heron
+        long double A_main = heron_area(t.A, t.B, t.C);
+        double heron_epsilon = 1e-14; 
+
+        std::cout << "Heron: Point (" << x << ", " << y << ") ";
+
+        if (A_main < 1e-9) 
+        {
+            double dist_AB = distance(t.A, t.B);
+            double dist_BC = distance(t.B, t.C);
+            double dist_CA = distance(t.C, t.A);
+            
+            double dist_AP = distance(t.A, P);
+            double dist_BP = distance(t.B, P);
+            double dist_CP = distance(t.C, P);
+
+            if (std::abs((dist_AP + dist_BP) - dist_AB) < heron_epsilon ||
+                std::abs((dist_BP + dist_CP) - dist_BC) < heron_epsilon ||
+                std::abs((dist_CP + dist_AP) - dist_CA) < heron_epsilon) 
+            {
+                std::cout << "is on the edge\n";
+            }
+            else 
+            {
+                std::cout << "is outside\n";
+            }
+            continue;
+        }
+
+        long double A1 = heron_area(t.A, t.B, P);
+        long double A2 = heron_area(t.B, t.C, P);
+        long double A3 = heron_area(t.C, t.A, P);
+        long double diff = std::abs(A_main - (A1 + A2 + A3));
+
+        if (diff > heron_epsilon) 
+        {
+            std::cout << "is outside\n";
+        }
+        else 
+        {
+            if (A1 < heron_epsilon || A2 < heron_epsilon || A3 < heron_epsilon) 
+            {
+                std::cout << "is on the edge\n";
+            }
+            else 
+            {
+                std::cout << "is inside\n";
+            }
         }
     }
 }
