@@ -42,16 +42,12 @@ bool is_triangle_valid(const Triangle& t)
 }
 
 long double distance(const Point& p1, const Point& p2) {
-    return std::sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
-}
+    long double dx = (long double)p1.x - (long double)p2.x;
+    long double dy = (long double)p1.y - (long double)p2.y;
+    return std::sqrt(dx * dx + dy * dy);}
 
 long double heron_area(const Point& A, const Point& B, const Point& C) {
-    long double a = distance(B, C);
-    long double b = distance(A, C);
-    long double c = distance(A, B);
-    long double s = (a + b + c) / 2.0;
-    long double val = s * (s - a) * (s - b) * (s - c);
-    return val > 0 ? std::sqrt(val) : 0.0;
+    return std::abs((A.x * (B.y - C.y) + B.x * (C.y - A.y) + C.x * (A.y - B.y)) / 2.0);
 }
 
 void check_points(const Triangle& t)
@@ -101,23 +97,23 @@ void check_points(const Triangle& t)
 
         // Heron
         long double A_main = heron_area(t.A, t.B, t.C);
-        double heron_epsilon = 1e-14; 
+        long double heron_epsilon = 1e-14; 
 
         std::cout << "Heron: Point (" << x << ", " << y << ") ";
 
-        if (A_main < 1e-9) 
+        if (A_main < heron_epsilon) 
         {
-            double dist_AB = distance(t.A, t.B);
-            double dist_BC = distance(t.B, t.C);
-            double dist_CA = distance(t.C, t.A);
+            long double dist_AB = distance(t.A, t.B);
+            long double dist_BC = distance(t.B, t.C);
+            long double dist_CA = distance(t.C, t.A);
             
-            double dist_AP = distance(t.A, P);
-            double dist_BP = distance(t.B, P);
-            double dist_CP = distance(t.C, P);
+            long double dist_AP = distance(t.A, P);
+            long double dist_BP = distance(t.B, P);
+            long double dist_CP = distance(t.C, P);
 
-            if (std::abs((dist_AP + dist_BP) - dist_AB) < heron_epsilon ||
-                std::abs((dist_BP + dist_CP) - dist_BC) < heron_epsilon ||
-                std::abs((dist_CP + dist_AP) - dist_CA) < heron_epsilon) 
+            if (std::abs((dist_AP + dist_BP) - dist_AB) < 1e-7 ||
+                std::abs((dist_BP + dist_CP) - dist_BC) < 1e-7 ||
+                std::abs((dist_CP + dist_AP) - dist_CA) < 1e-7) 
             {
                 std::cout << "is on the edge\n";
             }
@@ -125,7 +121,7 @@ void check_points(const Triangle& t)
             {
                 std::cout << "is outside\n";
             }
-            continue;
+            continue; 
         }
 
         long double A1 = heron_area(t.A, t.B, P);
