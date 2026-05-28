@@ -43,5 +43,7 @@ int Dyhotomia_class::count(double &x) {
     
     std::cout << "Found root: " << x << std::endl;
 
+    std::cout << "f(" << x << ") = " << f(x) << std::endl;
+
     return 0; 
 }
